@@ -94,7 +94,7 @@ terraform fmt
 
 Expected output: If any files were formatted, their names will be listed. If no formatting was needed, there will be no output.
 
-### 5. Validate the Configuration
+### 5. Initialize the Working Directory
  Initialize the working directory to prep the environment and download the provider:
 
  ```bash
