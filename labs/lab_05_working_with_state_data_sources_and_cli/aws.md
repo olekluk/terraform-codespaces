@@ -76,7 +76,7 @@ resource "aws_vpc" "development" {
     Environment = "development"
     Region      = data.aws_region.current.region
     Account     = data.aws_caller_identity.current.account_id
-    CreatedBy   = "${data.aws_caller_identity.current.account_id}-${data.aws_region.current.name}"
+    CreatedBy   = "${data.aws_caller_identity.current.account_id}-${data.aws_region.current.region}"
   }
 }
 
@@ -89,7 +89,7 @@ resource "aws_subnet" "development" {
   tags = {
     Name        = "development-subnet"
     Environment = "development"
-    AZInfo      = "${data.aws_region.current.name}-${data.aws_availability_zones.available.names[0]}"
+    AZInfo      = "${data.aws_region.current.region}-${data.aws_availability_zones.available.names[0]}"
   }
 }
 ```
