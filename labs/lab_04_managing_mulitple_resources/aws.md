@@ -122,31 +122,42 @@ resource "aws_security_group" "example" {
   description = "Example security group for our VPC"
   vpc_id      = aws_vpc.main.id
 
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  revoke_rules_on_delete = true
 
   tags = {
-    Name = "example-security-group"
+    Name        = "example-security-group"
     Environment = var.environment
   }
+}
+
+resource "aws_security_group_rule" "allow_http" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.example.id
+  description       = "Allow HTTP (80)"
+}
+
+resource "aws_security_group_rule" "allow_https" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.example.id
+  description       = "Allow HTTPS (443)"
+}
+
+resource "aws_security_group_rule" "egress_all" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.example.id
+  description       = "Allow all outbound traffic"
 }
 ```
 
