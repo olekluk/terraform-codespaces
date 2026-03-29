@@ -1,57 +1,79 @@
-# Static configuration with repetitive elements
+# Get subscription information
+data "azurerm_subscription" "current" {}
+
+locals {
+  # Common tags for all resources
+  tags = {
+    Environment  = var.environment
+    Project      = "terraform-improved-demo"
+    Owner        = "devops-team"
+    CostCenter   = "cc-5678"
+    Region       = var.location
+    ManagedBy    = "terraform"
+    Subscription = data.azurerm_subscription.current.display_name
+  }
+
+  # Common name prefix for resources
+  name_prefix = "${var.environment}-tf-"
+}
+
 resource "azurerm_resource_group" "main" {
-  name     = "production-resources"
-  location = "eastus"
+  name     = "${local.name_prefix}resources"
+  location = var.location
 
   tags = {
-    Name        = "production-resources"
-    Environment = "production"
-    Project     = "terraform-demo"
-    Owner       = "infrastructure-team"
-    CostCenter  = "cc-1234"
-    Region      = "eastus"
+    Name         = "${local.name_prefix}resources"
+    Environment  = local.tags.Environment
+    Project      = local.tags.Project
+    Owner        = local.tags.Owner
+    CostCenter   = local.tags.CostCenter
+    Region       = local.tags.Region
+    ManagedBy    = local.tags.ManagedBy
+    Subscription = local.tags.Subscription
   }
 }
 
 resource "azurerm_virtual_network" "main" {
-  name                = "production-vnet"
+  name                = "${local.name_prefix}vnet"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
-  address_space       = ["10.0.0.0/16"]
+  address_space       = var.vnet_address_space
 
   tags = {
-    Name        = "production-vnet"
-    Environment = "production"
-    Project     = "terraform-demo"
-    Owner       = "infrastructure-team"
-    CostCenter  = "cc-1234"
-    Region      = "eastus"
+    Name         = "${local.name_prefix}vnet"
+    Environment  = local.tags.Environment
+    Project      = local.tags.Project
+    Owner        = local.tags.Owner
+    CostCenter   = local.tags.CostCenter
+    Region       = local.tags.Region
+    ManagedBy    = local.tags.ManagedBy
+    Subscription = local.tags.Subscription
   }
 }
 
 resource "azurerm_subnet" "web" {
-  name                 = "production-web-subnet"
+  name                 = "${local.name_prefix}web-subnet"
   resource_group_name  = azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefixes     = ["10.0.1.0/24"]
 }
 
 resource "azurerm_subnet" "app" {
-  name                 = "production-app-subnet"
+  name                 = "${local.name_prefix}app-subnet"
   resource_group_name  = azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefixes     = ["10.0.2.0/24"]
 }
 
 resource "azurerm_subnet" "db" {
-  name                 = "production-db-subnet"
+  name                 = "${local.name_prefix}db-subnet"
   resource_group_name  = azurerm_resource_group.main.name
   virtual_network_name = azurerm_virtual_network.main.name
   address_prefixes     = ["10.0.3.0/24"]
 }
 
 resource "azurerm_network_security_group" "web" {
-  name                = "production-web-nsg"
+  name                = "${local.name_prefix}web-nsg"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
@@ -80,11 +102,13 @@ resource "azurerm_network_security_group" "web" {
   }
 
   tags = {
-    Name        = "production-web-nsg"
-    Environment = "production"
-    Project     = "terraform-demo"
-    Owner       = "infrastructure-team"
-    CostCenter  = "cc-1234"
-    Region      = "eastus"
+    Name         = "${local.name_prefix}web-nsg"
+    Environment  = local.tags.Environment
+    Project      = local.tags.Project
+    Owner        = local.tags.Owner
+    CostCenter   = local.tags.CostCenter
+    Region       = local.tags.Region
+    ManagedBy    = local.tags.ManagedBy
+    Subscription = local.tags.Subscription
   }
 }
