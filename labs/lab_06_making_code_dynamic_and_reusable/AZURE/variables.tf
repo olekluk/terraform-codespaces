@@ -1,1 +1,36 @@
 # Add variables below
+variable "environment" {
+  description = "env var"
+  type        = string
+  default     = "SIT"
+}
+
+variable "location" {
+  description = "Azure region for resource deployment"
+  type        = string
+  default     = "centralpoland"
+}
+
+variable "vnet_address_space" {
+  description = "Address space for Virtual Network"
+  type        = list(string)
+  default     = ["10.0.0.0/16"]
+}
+
+variable "subnet_prefix" {
+  description = "Address prefix for subnet"
+  type        = list(string)
+  default     = ["10.0.1.0/24"]
+}
+
+variable "project_name" {
+  description = "Project name for resource tagging"
+  type        = string
+  default     = "dynamic-infrastructure"
+}
+
+variable "managed_by" {
+  description = "Source of the infr"
+  type        = string
+  default     = "terraform"
+}
