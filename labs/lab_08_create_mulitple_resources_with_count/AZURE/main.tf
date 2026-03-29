@@ -9,60 +9,81 @@ resource "azurerm_resource_group" "main" {
 }
 
 # Individual Virtual Networks
-resource "azurerm_virtual_network" "vnet1" {
-  name                = "vnet-1"
-  address_space       = ["10.1.0.0/16"]
+resource "azurerm_virtual_network" "vnet" {
+  count               = var.vnet_count
+  name                = "vnet-${count.index + 1}"
+  address_space       = [var.vnet_address_spaces[count.index]]
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
   tags = {
     Environment = "Development"
-    Network     = "VNet1"
+    Network     = "VNet${count.index + 1}"
   }
 }
+# resource "azurerm_virtual_network" "vnet1" {
+#   name                = "vnet-1"
+#   address_space       = ["10.1.0.0/16"]
+#   location            = azurerm_resource_group.main.location
+#   resource_group_name = azurerm_resource_group.main.name
 
-resource "azurerm_virtual_network" "vnet2" {
-  name                = "vnet-2"
-  address_space       = ["10.2.0.0/16"]
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
+#   tags = {
+#     Environment = "Development"
+#     Network     = "VNet1"
+#   }
+# }
 
-  tags = {
-    Environment = "Development"
-    Network     = "VNet2"
-  }
-}
+# resource "azurerm_virtual_network" "vnet2" {
+#   name                = "vnet-2"
+#   address_space       = ["10.2.0.0/16"]
+#   location            = azurerm_resource_group.main.location
+#   resource_group_name = azurerm_resource_group.main.name
 
-resource "azurerm_virtual_network" "vnet3" {
-  name                = "vnet-3"
-  address_space       = ["10.3.0.0/16"]
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
+#   tags = {
+#     Environment = "Development"
+#     Network     = "VNet2"
+#   }
+# }
 
-  tags = {
-    Environment = "Development"
-    Network     = "VNet3"
-  }
-}
+# resource "azurerm_virtual_network" "vnet3" {
+#   name                = "vnet-3"
+#   address_space       = ["10.3.0.0/16"]
+#   location            = azurerm_resource_group.main.location
+#   resource_group_name = azurerm_resource_group.main.name
+
+#   tags = {
+#     Environment = "Development"
+#     Network     = "VNet3"
+#   }
+# }
 
 # Individual Subnets
-resource "azurerm_subnet" "subnet1" {
-  name                 = "subnet-1"
+resource "azurerm_subnet" "subnet" {
+  count                = var.subnet_count
+  name                 = "subnet-${count.index + 1}"
   resource_group_name  = azurerm_resource_group.main.name
-  virtual_network_name = azurerm_virtual_network.vnet1.name
-  address_prefixes     = ["10.1.1.0/24"]
+  virtual_network_name = azurerm_virtual_network.vnet[0].name
+  address_prefixes     = [var.subnet_address_prefixes[count.index]]
 }
 
-resource "azurerm_subnet" "subnet2" {
-  name                 = "subnet-2"
-  resource_group_name  = azurerm_resource_group.main.name
-  virtual_network_name = azurerm_virtual_network.vnet1.name
-  address_prefixes     = ["10.1.2.0/24"]
-}
+# resource "azurerm_subnet" "subnet1" {
+#   name                 = "subnet-1"
+#   resource_group_name  = azurerm_resource_group.main.name
+#   virtual_network_name = azurerm_virtual_network.vnet[0].name
+#   address_prefixes     = ["10.1.1.0/24"]
+# }
+
+# resource "azurerm_subnet" "subnet2" {
+#   name                 = "subnet-2"
+#   resource_group_name  = azurerm_resource_group.main.name
+#   virtual_network_name = azurerm_virtual_network.vnet[0].name
+#   address_prefixes     = ["10.1.2.0/24"]
+# }
 
 # Individual Network Security Groups
-resource "azurerm_network_security_group" "web" {
-  name                = "web-nsg"
+resource "azurerm_network_security_group" "nsg" {
+  count = 3
+  name                = "web-nsg-${count.index}"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
