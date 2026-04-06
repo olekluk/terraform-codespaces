@@ -63,3 +63,53 @@ resource "azurerm_storage_account" "example" {
     Environment = var.environment
   }
 }
+
+# Subnet NSG Association
+resource "azurerm_subnet_network_security_group_association" "example" {
+  subnet_id                 = azurerm_subnet.example.id
+  network_security_group_id = azurerm_network_security_group.example.id
+}
+
+# Storage Containers
+resource "azurerm_storage_container" "logs" {
+  name                  = "logs"
+  storage_account_id    = azurerm_storage_account.example.id
+  container_access_type = "private"
+}
+
+resource "azurerm_storage_container" "data" {
+  name                  = "data"
+  storage_account_id    = azurerm_storage_account.example.id
+  container_access_type = "private"
+}
+
+# Storage container with explicit dependency
+resource "azurerm_storage_container" "backups" {
+  name                  = "backups"
+  storage_account_id    = azurerm_storage_account.example.id
+  container_access_type = "private"
+  
+  # Explicitly depend on the other containers - this ensures the other containers are created first
+  depends_on = [
+    azurerm_storage_container.logs,
+    azurerm_storage_container.data
+  ]
+}
+
+# Network Security Group Rule with explicit dependency
+resource "azurerm_network_security_rule" "https" {
+  name                        = "AllowHTTPS"
+  priority                    = 101
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "443"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+  resource_group_name         = azurerm_resource_group.example.name
+  network_security_group_name = azurerm_network_security_group.example.name
+  
+  # Explicitly depend on the NSG association to ensure the NSG is attached to the subnet before adding rules
+  depends_on = [azurerm_subnet_network_security_group_association.example]
+}
