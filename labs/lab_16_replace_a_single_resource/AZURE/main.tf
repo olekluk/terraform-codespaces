@@ -44,11 +44,11 @@ resource "azurerm_user_assigned_identity" "example" {
 }
 
 # Role Assignment
-resource "azurerm_role_assignment" "example" {
-  scope                = azurerm_storage_account.example.id
-  role_definition_name = var.role_definition_name
-  principal_id         = azurerm_user_assigned_identity.example.principal_id
-}
+# resource "azurerm_role_assignment" "example" {
+#   scope                = azurerm_storage_account.example.id
+#   role_definition_name = var.role_definition_name
+#   principal_id         = azurerm_user_assigned_identity.example.principal_id
+# }
 
 # Policy Definition
 resource "azurerm_policy_definition" "example" {
