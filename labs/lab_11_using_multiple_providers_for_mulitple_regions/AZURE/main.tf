@@ -51,3 +51,19 @@ resource "azurerm_storage_account" "secondary" {
     Region      = var.secondary_location
   }
 }
+
+# Storage Container in primary region
+resource "azurerm_storage_container" "primary" {
+  name                  = "data"
+  provider              = azurerm.primary                      # <--- add this line here
+  storage_account_id    = azurerm_storage_account.primary.id
+  container_access_type = "private"
+}
+
+# Storage Container in secondary region
+resource "azurerm_storage_container" "secondary" {
+  name                  = "data"
+  provider              = azurerm.secondary                      # <--- add this line here
+  storage_account_id    = azurerm_storage_account.secondary.id
+  container_access_type = "private"
+}
